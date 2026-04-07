@@ -26,7 +26,7 @@ public class ProductService {
                 "Advanced wireless illuminated keyboard", 109.99, 60));
         addProduct(new Product(null, "Dell XPS 15", "Laptops",
                 "Intel i9, 32GB RAM, OLED display", 1799.99, 8));
-        addProduct(new Product(null, "Samsung Galaxy S24", "Phones",
+        addProduct(new Product(null, "Samsung Galaxy S24", "Phones",//
                 "6.2 inch Dynamic AMOLED, 256GB", 799.99, 30));
     }
 
