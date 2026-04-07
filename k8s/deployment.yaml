@@ -5,7 +5,7 @@ metadata:
   labels:
     app: product-catalog
 spec:
-  replicas: 3
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
