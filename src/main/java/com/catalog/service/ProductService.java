@@ -33,7 +33,6 @@ public class ProductService {
     public List<Product> getAllProducts() {
         return new ArrayList<>(store.values());
     }
-//
     public List<Product> getByCategory(String category) {
         List<Product> result = new ArrayList<>();
         for (Product p : store.values()) {
