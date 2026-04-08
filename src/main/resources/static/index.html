@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Product Catalog — AKS Demo</title>
+  <title>Product Catalog — AKS + MySQL</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -18,7 +18,6 @@
     }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    /* HEADER */
     header {
       background: var(--surface); border-bottom: 1px solid var(--border);
       padding: 0 40px; display: flex; align-items: center;
@@ -32,8 +31,8 @@
     .badge { font-size: 0.75rem; font-weight: 500; padding: 6px 12px; border-radius: 20px; }
     .badge-green { background: #edfaf3; color: var(--success); border: 1px solid #b6ecd1; }
     .badge-blue { background: #eef4fd; color: var(--info); border: 1px solid #b6d4f5; }
+    .badge-purple { background: #f3eeff; color: #7c4dff; border: 1px solid #d1b3ff; }
 
-    /* POD INFO BANNER */
     .pod-banner {
       background: linear-gradient(135deg, #1a1a2e, #16213e);
       color: white; padding: 12px 40px;
@@ -42,35 +41,27 @@
     }
     .pod-banner-item { display: flex; align-items: center; gap: 8px; }
     .pod-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
     .pod-label { color: #888; }
     .pod-value { color: #fff; font-weight: 500; }
 
     main { max-width: 1200px; margin: 0 auto; padding: 36px 24px; }
 
-    /* KUBERNETES INFO CARDS */
-    .k8s-info {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 16px; margin-bottom: 36px;
-    }
+    .k8s-info { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 32px; }
     .k8s-card {
       background: var(--surface); border-radius: var(--radius);
-      padding: 20px; border: 1px solid var(--border);
+      padding: 18px; border: 1px solid var(--border);
       box-shadow: var(--shadow); transition: transform 0.2s;
       position: relative; overflow: hidden;
     }
-    .k8s-card::before {
-      content: ''; position: absolute; top: 0; left: 0;
-      right: 0; height: 3px; background: var(--accent);
-    }
+    .k8s-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--accent); }
     .k8s-card:hover { transform: translateY(-2px); }
-    .k8s-card-icon { font-size: 1.8rem; margin-bottom: 10px; }
-    .k8s-card-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 4px; }
-    .k8s-card-value { font-family: 'Playfair Display', serif; font-size: 1.6rem; }
-    .k8s-card-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+    .k8s-card-icon { font-size: 1.6rem; margin-bottom: 8px; }
+    .k8s-card-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 4px; }
+    .k8s-card-value { font-family: 'Playfair Display', serif; font-size: 1.4rem; }
+    .k8s-card-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
 
-    /* PRODUCT SECTION */
-    .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 16px; flex-wrap: wrap; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 16px; flex-wrap: wrap; }
     .section-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; }
     .toolbar-right { display: flex; gap: 10px; align-items: center; }
     input[type="text"] { padding: 9px 14px; border: 1px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; background: var(--surface); outline: none; width: 200px; }
@@ -79,6 +70,8 @@
     .btn { padding: 9px 18px; border-radius: 10px; border: none; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
     .btn-primary { background: var(--accent); color: white; }
     .btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); }
+    .btn-secondary { background: #7c4dff; color: white; }
+    .btn-secondary:hover { background: #6535e0; transform: translateY(-1px); }
     .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
     .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
     .btn-danger { background: transparent; border: 1px solid #fcc; color: var(--danger); padding: 5px 12px; font-size: 0.8rem; }
@@ -88,7 +81,7 @@
     .btn-cat { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 6px 14px; font-size: 0.82rem; border-radius: 20px; }
     .btn-cat.active { background: var(--accent); color: white; border-color: var(--accent); }
 
-    .categories { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+    .categories { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
 
     .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px; }
     .product-card {
@@ -98,43 +91,54 @@
       animation: fadeIn 0.4s ease both;
     }
     .product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
-    .card-top { background: linear-gradient(135deg, #f0ebe0, #e8e0d0); height: 110px; display: flex; align-items: center; justify-content: center; font-size: 2.8rem; }
+    .card-top { background: linear-gradient(135deg,#f0ebe0,#e8e0d0); height:110px; display:flex; align-items:center; justify-content:center; font-size:2.8rem; }
     .card-body { padding: 16px; }
-    .card-category { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 500; margin-bottom: 4px; }
-    .card-name { font-family: 'Playfair Display', serif; font-size: 1.05rem; margin-bottom: 6px; }
-    .card-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
-    .card-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-top: 1px solid var(--border); }
-    .card-price { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--accent-dark); }
-    .card-stock { font-size: 0.78rem; color: var(--text-muted); background: var(--bg); padding: 3px 9px; border-radius: 20px; }
-    .card-actions { display: flex; gap: 8px; padding: 0 16px 14px; }
+    .card-category { font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:var(--accent); font-weight:500; margin-bottom:4px; }
+    .card-name { font-family:'Playfair Display',serif; font-size:1.05rem; margin-bottom:6px; }
+    .card-desc { font-size:0.82rem; color:var(--text-muted); line-height:1.5; margin-bottom:12px; }
+    .card-footer { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-top:1px solid var(--border); }
+    .card-price { font-family:'Playfair Display',serif; font-size:1.15rem; color:var(--accent-dark); }
+    .card-stock { font-size:0.78rem; color:var(--text-muted); background:var(--bg); padding:3px 9px; border-radius:20px; }
+    .card-actions { display:flex; gap:8px; padding:0 16px 14px; }
 
-    /* MODAL */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 200; display: none; align-items: center; justify-content: center; }
-    .modal-overlay.active { display: flex; }
-    .modal { background: var(--surface); border-radius: 20px; padding: 32px; width: 100%; max-width: 460px; box-shadow: 0 24px 64px rgba(0,0,0,0.15); animation: slideUp 0.3s ease; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .modal-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 20px; }
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 5px; }
-    .form-group input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.92rem; outline: none; }
-    .form-group input:focus { border-color: var(--accent); }
-    .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(4px); z-index:200; display:none; align-items:center; justify-content:center; }
+    .modal-overlay.active { display:flex; }
+    .modal { background:var(--surface); border-radius:20px; padding:32px; width:100%; max-width:480px; box-shadow:0 24px 64px rgba(0,0,0,0.15); animation:slideUp 0.3s ease; }
+    @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .modal-title { font-family:'Playfair Display',serif; font-size:1.3rem; margin-bottom:20px; }
+    .form-group { margin-bottom:12px; }
+    .form-group label { display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted); margin-bottom:5px; }
+    .form-group input, .form-group select { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.92rem; outline:none; background:white; }
+    .form-group input:focus, .form-group select:focus { border-color:var(--accent); }
+    .modal-actions { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
 
-    .toast { position: fixed; bottom: 28px; right: 28px; background: var(--text); color: white; padding: 12px 22px; border-radius: 12px; font-size: 0.88rem; z-index: 300; display: none; }
-    .toast.show { display: block; animation: toastIn 0.3s ease; }
-    @keyframes toastIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .toast { position:fixed; bottom:28px; right:28px; background:var(--text); color:white; padding:12px 22px; border-radius:12px; font-size:0.88rem; z-index:300; display:none; }
+    .toast.show { display:block; animation:toastIn 0.3s ease; }
+    @keyframes toastIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
-    .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
-    .empty-icon { font-size: 3.5rem; margin-bottom: 12px; }
-    .empty h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 6px; color: var(--text); }
+    .empty { text-align:center; padding:60px 20px; color:var(--text-muted); }
+    .empty-icon { font-size:3.5rem; margin-bottom:12px; }
+    .empty h3 { font-family:'Playfair Display',serif; font-size:1.3rem; margin-bottom:6px; color:var(--text); }
 
-    @media (max-width: 768px) {
-      .k8s-info { grid-template-columns: repeat(2, 1fr); }
-      .pod-banner { padding: 10px 16px; gap: 16px; }
-      header { padding: 0 16px; }
-      main { padding: 20px 16px; }
+    .tabs { display:flex; gap:4px; background:var(--bg); padding:4px; border-radius:12px; margin-bottom:24px; width:fit-content; }
+    .tab { padding:8px 20px; border-radius:9px; border:none; font-family:'DM Sans',sans-serif; font-size:0.88rem; cursor:pointer; background:transparent; color:var(--text-muted); transition:all 0.2s; }
+    .tab.active { background:var(--surface); color:var(--text); font-weight:500; box-shadow:var(--shadow); }
+
+    .cat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; }
+    .cat-card { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); padding:20px; box-shadow:var(--shadow); transition:transform 0.2s; }
+    .cat-card:hover { transform:translateY(-2px); }
+    .cat-icon { font-size:2rem; margin-bottom:10px; }
+    .cat-name { font-family:'Playfair Display',serif; font-size:1.1rem; margin-bottom:4px; }
+    .cat-desc { font-size:0.82rem; color:var(--text-muted); }
+    .cat-actions { display:flex; gap:8px; margin-top:14px; }
+
+    @media(max-width:768px) {
+      .k8s-info { grid-template-columns:repeat(2,1fr); }
+      .pod-banner { padding:10px 16px; gap:16px; }
+      header { padding:0 16px; }
+      main { padding:20px 16px; }
     }
   </style>
 </head>
@@ -143,51 +147,39 @@
 <header>
   <div class="logo">Product<span>Catalog</span></div>
   <div class="header-right">
+    <span class="badge badge-purple">🗄️ MySQL</span>
     <span class="badge badge-blue" id="versionBadge">v—</span>
     <span class="badge badge-green" id="statusBadge">● Connecting...</span>
-    <button class="btn btn-primary" onclick="openAddModal()">+ Add Product</button>
+    <button class="btn btn-primary" onclick="openAddProductModal()">+ Add Product</button>
   </div>
 </header>
 
-<!-- Pod Info Banner -->
 <div class="pod-banner">
   <div class="pod-banner-item">
     <div class="pod-dot"></div>
     <span class="pod-label">Pod:</span>
     <span class="pod-value" id="podName">Loading...</span>
   </div>
-  <div class="pod-banner-item">
-    <span class="pod-label">Platform:</span>
-    <span class="pod-value">Azure AKS</span>
-  </div>
-  <div class="pod-banner-item">
-    <span class="pod-label">Container:</span>
-    <span class="pod-value">Docker</span>
-  </div>
-  <div class="pod-banner-item">
-    <span class="pod-label">Registry:</span>
-    <span class="pod-value">Azure ACR</span>
-  </div>
-  <div class="pod-banner-item">
-    <span class="pod-label">CI/CD:</span>
-    <span class="pod-value">GitHub Actions</span>
-  </div>
+  <div class="pod-banner-item"><span class="pod-label">Platform:</span><span class="pod-value">Azure AKS</span></div>
+  <div class="pod-banner-item"><span class="pod-label">Container:</span><span class="pod-value">Docker</span></div>
+  <div class="pod-banner-item"><span class="pod-label">Registry:</span><span class="pod-value">Azure ACR</span></div>
+  <div class="pod-banner-item"><span class="pod-label">Database:</span><span class="pod-value">Azure MySQL</span></div>
+  <div class="pod-banner-item"><span class="pod-label">CI/CD:</span><span class="pod-value">GitHub Actions</span></div>
 </div>
 
 <main>
-  <!-- Kubernetes Info Cards -->
   <div class="k8s-info">
     <div class="k8s-card">
       <div class="k8s-card-icon">🚀</div>
       <div class="k8s-card-label">Deployment</div>
       <div class="k8s-card-value">product-catalog</div>
-      <div class="k8s-card-sub">Kubernetes Deployment</div>
+      <div class="k8s-card-sub">Kubernetes</div>
     </div>
     <div class="k8s-card">
       <div class="k8s-card-icon">📦</div>
       <div class="k8s-card-label">Running Pods</div>
       <div class="k8s-card-value">3 <span style="font-size:1rem;color:var(--success)">✅</span></div>
-      <div class="k8s-card-sub">replicas: 3 (RollingUpdate)</div>
+      <div class="k8s-card-sub">replicas: 3</div>
     </div>
     <div class="k8s-card">
       <div class="k8s-card-icon">⚖️</div>
@@ -196,39 +188,80 @@
       <div class="k8s-card-sub">Azure Public IP</div>
     </div>
     <div class="k8s-card">
-      <div class="k8s-card-icon">🛡️</div>
-      <div class="k8s-card-label">Health Probes</div>
-      <div class="k8s-card-value">ON <span style="font-size:1rem;color:var(--success)">✅</span></div>
-      <div class="k8s-card-sub">Liveness + Readiness</div>
+      <div class="k8s-card-icon">🗄️</div>
+      <div class="k8s-card-label">Database</div>
+      <div class="k8s-card-value">MySQL</div>
+      <div class="k8s-card-sub">Azure Flexible Server</div>
+    </div>
+    <div class="k8s-card">
+      <div class="k8s-card-icon">🔄</div>
+      <div class="k8s-card-label">Update Strategy</div>
+      <div class="k8s-card-value">Rolling</div>
+      <div class="k8s-card-sub">Zero Downtime</div>
     </div>
   </div>
 
-  <!-- Product Toolbar -->
-  <div class="toolbar">
-    <div class="section-title">All Products</div>
-    <div class="toolbar-right">
-      <input type="text" id="searchInput" placeholder="Search products..." oninput="filterProducts()"/>
-      <button class="btn btn-outline" onclick="loadAll()">↻ Refresh</button>
-    </div>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('products')">📦 Products</button>
+    <button class="tab" onclick="showTab('categories')">🏷️ Categories</button>
   </div>
 
-  <div class="categories" id="categoryBar"></div>
-  <div id="productGrid" class="product-grid"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading...</h3></div></div>
+  <!-- Products Tab -->
+  <div id="productsTab">
+    <div class="toolbar">
+      <div class="section-title">All Products</div>
+      <div class="toolbar-right">
+        <input type="text" id="searchInput" placeholder="Search products..." oninput="filterProducts()"/>
+        <button class="btn btn-outline" onclick="loadAll()">↻ Refresh</button>
+      </div>
+    </div>
+    <div class="categories" id="categoryBar"></div>
+    <div id="productGrid" class="product-grid"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading...</h3></div></div>
+  </div>
+
+  <!-- Categories Tab -->
+  <div id="categoriesTab" style="display:none">
+    <div class="toolbar">
+      <div class="section-title">All Categories</div>
+      <div class="toolbar-right">
+        <button class="btn btn-secondary" onclick="openAddCategoryModal()">+ Add Category</button>
+        <button class="btn btn-outline" onclick="loadCategories()">↻ Refresh</button>
+      </div>
+    </div>
+    <div id="categoryGrid" class="cat-grid"></div>
+  </div>
 </main>
 
-<!-- Modal -->
-<div class="modal-overlay" id="modalOverlay">
+<!-- Product Modal -->
+<div class="modal-overlay" id="productModal">
   <div class="modal">
-    <div class="modal-title" id="modalTitle">Add Product</div>
-    <input type="hidden" id="editId"/>
+    <div class="modal-title" id="productModalTitle">Add Product</div>
+    <input type="hidden" id="editProductId"/>
     <div class="form-group"><label>Product Name</label><input type="text" id="inputName" placeholder="e.g. Wireless Keyboard"/></div>
-    <div class="form-group"><label>Category</label><input type="text" id="inputCategory" placeholder="e.g. Accessories"/></div>
+    <div class="form-group"><label>Category</label>
+      <select id="inputCategoryId"></select>
+    </div>
     <div class="form-group"><label>Description</label><input type="text" id="inputDesc" placeholder="Short description"/></div>
     <div class="form-group"><label>Price ($)</label><input type="text" id="inputPrice" placeholder="e.g. 49.99"/></div>
     <div class="form-group"><label>Stock</label><input type="text" id="inputStock" placeholder="e.g. 100"/></div>
     <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-outline" onclick="closeModals()">Cancel</button>
       <button class="btn btn-primary" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- Category Modal -->
+<div class="modal-overlay" id="categoryModal">
+  <div class="modal">
+    <div class="modal-title" id="categoryModalTitle">Add Category</div>
+    <input type="hidden" id="editCategoryId"/>
+    <div class="form-group"><label>Category Name</label><input type="text" id="inputCatName" placeholder="e.g. Laptops"/></div>
+    <div class="form-group"><label>Description</label><input type="text" id="inputCatDesc" placeholder="e.g. Portable computers"/></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModals()">Cancel</button>
+      <button class="btn btn-secondary" onclick="saveCategory()">Save Category</button>
     </div>
   </div>
 </div>
@@ -237,14 +270,15 @@
 
 <script>
   const API = '/api/products';
+  const CAT_API = '/api/categories';
   let allProducts = [];
+  let allCategories = [];
   let activeCategory = 'All';
   const ICONS = ['💻','📱','🎧','📷','⌨️','🖥️','🖨️','📺','🎮','⌚','🔋','💡','🖱️','📡','🔌'];
+  const CAT_ICONS = ['💻','📱','🎧','🖥️','⌨️','📦','🎮','📷','⌚','🔋'];
 
-  function getIcon(name) {
-    let h = 0; for (let c of name) h += c.charCodeAt(0);
-    return ICONS[h % ICONS.length];
-  }
+  function getIcon(name) { let h=0; for(let c of name) h+=c.charCodeAt(0); return ICONS[h%ICONS.length]; }
+  function getCatIcon(name) { let h=0; for(let c of name) h+=c.charCodeAt(0); return CAT_ICONS[h%CAT_ICONS.length]; }
 
   async function loadPodInfo() {
     try {
@@ -254,40 +288,58 @@
       document.getElementById('versionBadge').textContent = 'v' + info.version;
       document.getElementById('statusBadge').textContent = '● Live on AKS';
       document.getElementById('statusBadge').style.color = '#4caf7d';
-    } catch (e) {
+    } catch(e) {
       document.getElementById('podName').textContent = 'local-machine';
     }
   }
 
   async function loadAll() {
+    await loadCategories();
+    await loadProducts();
+  }
+
+  async function loadProducts() {
     try {
       const res = await fetch(API);
       allProducts = await res.json();
-      loadCategories();
+      renderCategoryBar();
       renderProducts(allProducts);
-    } catch (e) {
+    } catch(e) {
       document.getElementById('productGrid').innerHTML =
-        `<div class="empty"><div class="empty-icon">⚠️</div><h3>Could not connect</h3><p>Make sure the backend is running</p></div>`;
+        `<div class="empty"><div class="empty-icon">⚠️</div><h3>Could not connect</h3></div>`;
     }
   }
 
-  function loadCategories() {
-    const cats = ['All', ...new Set(allProducts.map(p => p.category))];
+  async function loadCategories() {
+    try {
+      const res = await fetch(CAT_API);
+      allCategories = await res.json();
+      renderCategoryGrid();
+      populateCategoryDropdown();
+    } catch(e) {}
+  }
+
+  function renderCategoryBar() {
+    const cats = ['All', ...allCategories.map(c => c.name)];
     document.getElementById('categoryBar').innerHTML = cats.map(c =>
-      `<button class="btn btn-cat ${c === activeCategory ? 'active' : ''}" onclick="filterByCategory('${c}')">${c}</button>`
+      `<button class="btn btn-cat ${c===activeCategory?'active':''}" onclick="filterByCategory('${c}')">${c}</button>`
     ).join('');
   }
 
   function filterByCategory(cat) {
     activeCategory = cat;
-    loadCategories();
-    renderProducts(cat === 'All' ? allProducts : allProducts.filter(p => p.category === cat));
+    renderCategoryBar();
+    if (cat === 'All') {
+      renderProducts(allProducts);
+    } else {
+      renderProducts(allProducts.filter(p => p.category && p.category.name === cat));
+    }
   }
 
   function filterProducts() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     renderProducts(allProducts.filter(p =>
-      p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
+      p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)
     ));
   }
 
@@ -297,11 +349,11 @@
       grid.innerHTML = `<div class="empty"><div class="empty-icon">📦</div><h3>No products found</h3></div>`;
       return;
     }
-    grid.innerHTML = products.map((p, i) => `
-      <div class="product-card" style="animation-delay:${i * 0.05}s">
+    grid.innerHTML = products.map((p,i) => `
+      <div class="product-card" style="animation-delay:${i*0.05}s">
         <div class="card-top">${getIcon(p.name)}</div>
         <div class="card-body">
-          <div class="card-category">${p.category}</div>
+          <div class="card-category">${p.category ? p.category.name : 'Uncategorized'}</div>
           <div class="card-name">${p.name}</div>
           <div class="card-desc">${p.description}</div>
         </div>
@@ -310,64 +362,144 @@
           <div class="card-stock">Stock: ${p.stock}</div>
         </div>
         <div class="card-actions">
-          <button class="btn btn-edit" onclick="openEditModal(${p.id})">✏️ Edit</button>
+          <button class="btn btn-edit" onclick="openEditProductModal(${p.id})">✏️ Edit</button>
           <button class="btn btn-danger" onclick="deleteProduct(${p.id})">🗑 Delete</button>
         </div>
       </div>
     `).join('');
   }
 
-  function openAddModal() {
-    document.getElementById('modalTitle').textContent = 'Add Product';
-    document.getElementById('editId').value = '';
-    ['inputName','inputCategory','inputDesc','inputPrice','inputStock'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('modalOverlay').classList.add('active');
+  function renderCategoryGrid() {
+    const grid = document.getElementById('categoryGrid');
+    if (!allCategories.length) {
+      grid.innerHTML = `<div class="empty"><div class="empty-icon">🏷️</div><h3>No categories yet</h3></div>`;
+      return;
+    }
+    grid.innerHTML = allCategories.map((c,i) => `
+      <div class="cat-card" style="animation-delay:${i*0.05}s">
+        <div class="cat-icon">${getCatIcon(c.name)}</div>
+        <div class="cat-name">${c.name}</div>
+        <div class="cat-desc">${c.description || ''}</div>
+        <div class="cat-actions">
+          <button class="btn btn-edit" onclick="openEditCategoryModal(${c.id})">✏️ Edit</button>
+          <button class="btn btn-danger" onclick="deleteCategory(${c.id})">🗑 Delete</button>
+        </div>
+      </div>
+    `).join('');
   }
 
-  function openEditModal(id) {
+  function populateCategoryDropdown() {
+    const sel = document.getElementById('inputCategoryId');
+    sel.innerHTML = allCategories.map(c =>
+      `<option value="${c.id}">${c.name}</option>`
+    ).join('');
+  }
+
+  function showTab(tab) {
+    document.getElementById('productsTab').style.display = tab === 'products' ? '' : 'none';
+    document.getElementById('categoriesTab').style.display = tab === 'categories' ? '' : 'none';
+    document.querySelectorAll('.tab').forEach((t,i) => {
+      t.classList.toggle('active', (i===0&&tab==='products')||(i===1&&tab==='categories'));
+    });
+  }
+
+  function openAddProductModal() {
+    document.getElementById('productModalTitle').textContent = 'Add Product';
+    document.getElementById('editProductId').value = '';
+    ['inputName','inputDesc','inputPrice','inputStock'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('productModal').classList.add('active');
+  }
+
+  function openEditProductModal(id) {
     const p = allProducts.find(x => x.id === id);
     if (!p) return;
-    document.getElementById('modalTitle').textContent = 'Edit Product';
-    document.getElementById('editId').value = p.id;
+    document.getElementById('productModalTitle').textContent = 'Edit Product';
+    document.getElementById('editProductId').value = p.id;
     document.getElementById('inputName').value = p.name;
-    document.getElementById('inputCategory').value = p.category;
     document.getElementById('inputDesc').value = p.description;
     document.getElementById('inputPrice').value = p.price;
     document.getElementById('inputStock').value = p.stock;
-    document.getElementById('modalOverlay').classList.add('active');
+    if (p.category) document.getElementById('inputCategoryId').value = p.category.id;
+    document.getElementById('productModal').classList.add('active');
   }
 
-  function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+  function openAddCategoryModal() {
+    document.getElementById('categoryModalTitle').textContent = 'Add Category';
+    document.getElementById('editCategoryId').value = '';
+    document.getElementById('inputCatName').value = '';
+    document.getElementById('inputCatDesc').value = '';
+    document.getElementById('categoryModal').classList.add('active');
+  }
+
+  function openEditCategoryModal(id) {
+    const c = allCategories.find(x => x.id === id);
+    if (!c) return;
+    document.getElementById('categoryModalTitle').textContent = 'Edit Category';
+    document.getElementById('editCategoryId').value = c.id;
+    document.getElementById('inputCatName').value = c.name;
+    document.getElementById('inputCatDesc').value = c.description || '';
+    document.getElementById('categoryModal').classList.add('active');
+  }
+
+  function closeModals() {
+    document.getElementById('productModal').classList.remove('active');
+    document.getElementById('categoryModal').classList.remove('active');
+  }
 
   async function saveProduct() {
-    const id = document.getElementById('editId').value;
+    const id = document.getElementById('editProductId').value;
+    const categoryId = document.getElementById('inputCategoryId').value;
     const body = {
       name: document.getElementById('inputName').value,
-      category: document.getElementById('inputCategory').value,
       description: document.getElementById('inputDesc').value,
       price: parseFloat(document.getElementById('inputPrice').value),
-      stock: parseInt(document.getElementById('inputStock').value)
+      stock: parseInt(document.getElementById('inputStock').value),
+      category: { id: parseInt(categoryId) }
     };
-    if (!body.name || !body.category || !body.description || isNaN(body.price) || isNaN(body.stock)) {
+    if (!body.name || !body.description || isNaN(body.price) || isNaN(body.stock)) {
       showToast('⚠️ Please fill all fields'); return;
     }
     try {
       if (id) {
-        await fetch(`${API}/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+        await fetch(`${API}/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
         showToast('✅ Product updated!');
       } else {
-        await fetch(API, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+        await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
         showToast('✅ Product added!');
       }
-      closeModal(); loadAll();
-    } catch (e) { showToast('❌ Something went wrong'); }
+      closeModals(); loadAll();
+    } catch(e) { showToast('❌ Something went wrong'); }
+  }
+
+  async function saveCategory() {
+    const id = document.getElementById('editCategoryId').value;
+    const body = {
+      name: document.getElementById('inputCatName').value,
+      description: document.getElementById('inputCatDesc').value
+    };
+    if (!body.name) { showToast('⚠️ Category name required'); return; }
+    try {
+      if (id) {
+        await fetch(`${CAT_API}/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+        showToast('✅ Category updated!');
+      } else {
+        await fetch(CAT_API, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+        showToast('✅ Category added!');
+      }
+      closeModals(); loadAll();
+    } catch(e) { showToast('❌ Something went wrong'); }
   }
 
   async function deleteProduct(id) {
     if (!confirm('Delete this product?')) return;
-    await fetch(`${API}/${id}`, { method: 'DELETE' });
-    showToast('🗑 Product deleted');
-    loadAll();
+    await fetch(`${API}/${id}`, { method:'DELETE' });
+    showToast('🗑 Product deleted'); loadAll();
+  }
+
+  async function deleteCategory(id) {
+    if (!confirm('Delete this category? Products in this category will be affected!')) return;
+    await fetch(`${CAT_API}/${id}`, { method:'DELETE' });
+    showToast('🗑 Category deleted'); loadAll();
   }
 
   function showToast(msg) {
@@ -376,8 +508,8 @@
     setTimeout(() => t.classList.remove('show'), 3000);
   }
 
-  document.getElementById('modalOverlay').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', function(e) { if(e.target===this) closeModals(); });
   });
 
   loadPodInfo();

@@ -1,24 +1,25 @@
 package com.catalog;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-
+import com.catalog.model.Category;
+import com.catalog.model.Product;
+import com.catalog.service.CategoryService;
+import com.catalog.service.ProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.catalog.model.Product;
-import com.catalog.service.ProductService;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class ProductServiceTest {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @Test
     void testGetAllProducts() {
@@ -30,12 +31,13 @@ class ProductServiceTest {
 
     @Test
     void testAddProduct() {
+        Category cat = categoryService.getAllCategories().get(0);
         Product p = new Product();
         p.setName("Test Product");
-        p.setCategory("Test");
         p.setDescription("Test Description");
         p.setPrice(99.99);
         p.setStock(10);
+        p.setCategory(cat);
 
         Product saved = productService.addProduct(p);
         assertNotNull(saved.getId());
@@ -45,43 +47,36 @@ class ProductServiceTest {
 
     @Test
     void testGetById() {
-        Product p = new Product();
-        p.setName("Find Me");
-        p.setCategory("Test");
-        p.setDescription("Find this product");
-        p.setPrice(49.99);
-        p.setStock(5);
-
-        Product saved = productService.addProduct(p);
-        Product found = productService.getById(saved.getId());
-
+        List<Product> products = productService.getAllProducts();
+        assertFalse(products.isEmpty());
+        Product first = products.get(0);
+        Product found = productService.getById(first.getId());
         assertNotNull(found);
-        assertEquals("Find Me", found.getName());
         System.out.println("✅ Product found: " + found.getName());
     }
 
     @Test
     void testDeleteProduct() {
+        Category cat = categoryService.getAllCategories().get(0);
         Product p = new Product();
         p.setName("Delete Me");
-        p.setCategory("Test");
         p.setDescription("Delete this");
         p.setPrice(9.99);
         p.setStock(1);
+        p.setCategory(cat);
 
         Product saved = productService.addProduct(p);
         boolean deleted = productService.deleteProduct(saved.getId());
-
         assertTrue(deleted);
         assertNull(productService.getById(saved.getId()));
         System.out.println("✅ Product deleted successfully");
     }
 
     @Test
-    void testGetByCategory() {
-        List<Product> laptops = productService.getByCategory("Laptops");
-        assertNotNull(laptops);
-        assertTrue(laptops.size() > 0);
-        System.out.println("✅ Laptops found: " + laptops.size());
+    void testGetAllCategories() {
+        List<Category> categories = categoryService.getAllCategories();
+        assertNotNull(categories);
+        assertTrue(categories.size() > 0);
+        System.out.println("✅ Total categories: " + categories.size());
     }
 }

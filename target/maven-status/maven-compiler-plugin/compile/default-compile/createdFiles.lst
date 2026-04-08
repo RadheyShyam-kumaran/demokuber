@@ -1,6 +1,0 @@
-com\catalog\CatalogApplication.class
-com\catalog\controller\HomeController.class
-com\catalog\model\Product.class
-com\catalog\model\PodInfo.class
-com\catalog\service\ProductService.class
-com\catalog\controller\ProductController.class

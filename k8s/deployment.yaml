@@ -5,7 +5,7 @@ metadata:
   labels:
     app: product-catalog
 spec:
-  replicas: 2
+  replicas: 3
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -30,14 +30,34 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: APP_VERSION
-              value: "2.0"
+              value: "3.0"
+            - name: MYSQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-host
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-password
+            - name: MYSQL_DB
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-db
           resources:
             requests:
               memory: "256Mi"
-              cpu: "200m"
+              cpu: "250m"
             limits:
               memory: "512Mi"
-              cpu: "400m"
+              cpu: "500m"
           readinessProbe:
             httpGet:
               path: /api/products/health
